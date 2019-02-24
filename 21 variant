@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <locale.h>
+void asm(char*A) {
+    char a = A[0];
+    char b = A[1];
+    char c = A[2];
+    __asm {
+        mov ah, a;
+        sub ah, 48;
+        mov bh, b;
+        sub bh, 48;
+        mov ch, c;
+        sub ch, 48;
+        mov dh, ah;
+        add dh, ch;
+        cmp bh, dh;
+        jne b1;
+        je a1;
+        a1: mov ah, bh;
+        jmp f1;
+        b1: mov dh, ah;
+        sub dh, bh;
+        test dh, dh;
+        jns c1;
+        neg dh;
+        jmp c1;
+        c1: mov ch, dh;
+        jmp f1;
+        f1: add ah, 48;
+        mov a, ah;
+        add bh, 48;
+        mov b, bh;
+        add ch, 48;
+        mov c, ch;
+    }
+    *A = a;
+    *(A + 1) = b;
+    *(A + 2) = c;
+}
+int main() {
+    setlocale(LC_ALL, "Rus");
+    char A[5];
+    printf("Введите трехзначное число: ");
+    fgets(A, 5, stdin);
+    if ((A[0] < 49) || (A[0] > 57) || (A[1] < 48) || (A[1] > 57) || (A[2] < 48) || (A[2] > 57) || (A[3] != '\n')) { printf("Введено неверное значение"); return 1; }
+    A[3] = '\0';
+    asm(A);
+    printf("После пеобразования получилось: %s", A);
+    return 0;
+}
